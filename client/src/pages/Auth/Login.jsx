@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import AuthLayout from "../../components/layouts/AuthLayout";
 import {Link, useNavigate} from "react-router-dom";
 import Input from "../../components/inputs/Input";
 import { validateEmail } from "../../utils/helper";
+import { API_PATHS } from "../../utils/apiPath";
+import axiosInstance from "../../utils/axiosInstance"
+import { userContext } from "../../context/useContext";
 const Login = () => {
   const[email,setEmail]=useState("");
   const[name,setName]=useState("");
   const[error,setError]=useState(null);
   const[password,setPassword]=useState("");
+  const{updateUser}=useContext(userContext)
   const navigate=useNavigate();
   const handleLogin=async (e)=>{
     e.preventDefault();
@@ -22,6 +26,40 @@ const Login = () => {
       return;
     }
     setError("");
+    //Login API CALL
+    try{
+      const response=await axiosInstance.post(API_PATHS.AUTH.LOGIN,{
+        email,
+        password,
+      })
+      console.log(response.data);
+      const {token,role}=response.data;
+      updateUser(response.data);
+      if(token)
+      {
+        localStorage.setItem("token",token);
+        if(role==="admin")
+        {
+          navigate("/admin/dashboard");
+        }
+        else{
+          navigate("/user/dashboard");
+        }
+      }
+    }
+    catch(error){
+      if(error.response&&error.response.data.message){
+        setError(error.response.data.message);
+      }
+      else{
+          console.log("Full Error:", error);
+  console.log("Response:", error.response);
+  console.log("Data:", error.response?.data);
+
+        setError("Something went wrong.Please try again.");
+      }
+    }
+  
   }
 
   return (
