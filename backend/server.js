@@ -1,6 +1,6 @@
 // Load environment variables FIRST
 require("dotenv").config();
-
+const path = require("path");
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
@@ -28,7 +28,8 @@ app.use(express.json());
 app.use("/api/auth",authRoutes);
 app.use("/api/users",userRoutes)
 app.use("/api/tasks",taskRoutes)
-app.use("/api/reports",reportRoutes)
+app.use("/api/reports",reportRoutes);
+app.use("/uploads",express.static(path.join(__dirname,"uploads")));
 // Test Route
 app.get("/", (req, res) => {
   res.send("API is running...");
