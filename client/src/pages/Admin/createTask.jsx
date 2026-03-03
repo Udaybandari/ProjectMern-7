@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout"
 import { PRIORIY_DATA } from "../../utils/data";
 import axiosInstance from "../../utils/axiosInstance";
@@ -8,13 +8,18 @@ import { useLocation,useNavigate } from "react-router-dom";
 import moment from "moment";
 import { LuTrash2 } from "react-icons/lu";
 import SelectDropdown from "../../components/inputs/SelectDropdown";
-
+import Modal from "../../components/Model";
 import SelectUsers from "../../components/inputs/SelectUsers";
+import TodoListInput from "../../components/inputs/TodoListInput";
+import AddAttachments from "../../components/inputs/AddAttachments";
+import DeleteAlert from "../../components/layouts/DeleteAlert";
 const createTask = () => {
   
   const location=useLocation();
   const {taskId}=location.state||{};
+  
   const navigate=useNavigate();
+ 
   const [taskData,setTaskData]=useState({
     title:"",
     description:"",
@@ -37,24 +42,144 @@ const createTask = () => {
     priority:"Low",
     dueDate:null,
     assignedTo:[],
+    todoChecklist:[],
     attachments:[],
   })
   }
   const createTask = async ()=>{
-
+     try{
+      const todolist=taskData.todoChecklist?.map((item)=>({
+      text:item,
+      completed:false,
+     }))
+     const response=await axiosInstance.post(API_PATHS.TASKS.CREATE_TASK,{
+      ...taskData,
+      dueDate:new Date(taskData.dueDate).toISOString(),
+      todoChecklist:todolist,
+     });
+     
+     toast.success("Task Created Successfully");
+     clearData();
+     }
+     catch(error)
+     {
+      console.error("Error creating task:",error);
+      setLoading(false);
+     }
+     finally{
+      setLoading(false);
+     }
+     
   };
+
   const updateTask =async ()=>{
-
-  };
+    setLoading(true);
+    try{
+      const todolist = taskData.todoChecklist?.map((item) => {
+   const prevTodoChecklist = currentTask?.todoChecklist || [];
+    const matchedTask = prevTodoChecklist.find((task) => task.text==item);
+return {
+text: item,
+completed: matchedTask ? matchedTask.completed: false,
+}});
+const response=await axiosInstance.put(
+  API_PATHS.TASKS.UPDATE_TASK(taskId),
+  {
+    ...taskData,
+    dueDate:new Date(taskData.dueDate).toISOString(),
+    todoChecklist:todolist,
+  }
+);
+toast.success("Task Updated Successfully");
+}catch(error){
+  console.error("Error creating task:",error);
+  setLoading(false);
+}
+finally{
+  setLoading(false)
+}
+    
+}
   const handleSubmit =async ()=>{
-
+     if(!taskData.title.trim())
+     {
+      setError("Title is required");
+      return
+     }
+     if(!taskData.description.trim())
+     {
+      setError("description is required");
+      return
+     }
+     if(!taskData.dueDate.trim())
+     {
+      setError("dueDate is required");
+      return
+     }
+     if(taskData.assignedTo?.length===0)
+     {
+      setError("Task not assigned to any member");
+      return
+     }
+     if(taskData.todoChecklist?.length===0)
+     {
+      setError("Add atleast one todo task");
+      return
+     }
+     if(taskId)
+     {
+      updateTask();
+      return;
+     }
+     createTask();
   }
   const getTaskDetailsById =async ()=>{
+   try {
+const response = await axiosInstance.get( API_PATHS.TASKS.GET_TASK_BY_ID(taskId)
+);
+if (response.data) {
+const taskInfo = response.data;
+setCurrentTask(taskInfo);
+setTaskData ((prevState) => ({
+title: taskInfo.title,
+description: taskInfo.description,
+priority: taskInfo.priority,
+dueDate: taskInfo.dueDate
+? moment (taskInfo.dueDate).format("YYYY-MM-DD")
+: null,
+assignedTo: taskInfo?.assignedTo?.map((item) => item?._id) || [],
+ todoChecklist:taskInfo?.todoChecklist?.map((item) => item?.text) || [],
+attachments: taskInfo?.attachments || [],
+}))
+}
+  }
+  catch(error)
+  {
+   console.log("Error fetching users:",error)
+  }
 
   };
   const deleteTask =async ()=>{
-
+     
+try {
+await axiosInstance.delete(API_PATHS. TASKS.DELETE_TASK (taskId));
+setOpenDeleteAlert(false);
+toast.success("Expense details deleted successfully");
+navigate('/admin/tasks')
+} catch (error) {
+console.error(
+);
+"Error deleting expense:",
+error.response?.data?.message || error.message
   };
+  useEffect(()=>{
+  if(taskId)
+  {
+    getTaskDetailsById(taskId);
+  }
+  return ()=>{};
+  },[taskId])
+}
   return (
     <DashboardLayout activeMenu="Create Task">
      <div className="mt-5">
@@ -103,23 +228,68 @@ const createTask = () => {
               />
     
             </div>
-          </div>
-          <div>
+             <div className="col-span-6 md:col-span-4">
             <label className="text-xs font-medium text-slate-600">
               Due Date
             </label>
-    
+                <input
+                placeholder=""
+                className="form-input"
+                value={taskData.dueDate}
+                 onChange={({target})=>handleValueChange("dueDate",target.value)}
+                 type="date"
+                />
           </div>
-          <div>
-            <label >Assign To</label>
+                    <div className="col-span-12 md:col-span-3">
+            <label className="text-xs font-medium text-slate-600" >Assign To</label>
             <SelectUsers
             selectedUsers={taskData.assignedTo}
             setSelectedUsers={(value)=>{
               handleValueChange("assignedTo",value);}}/>
           </div>
+          </div>
+         <div className="mt-3">
+          <label className="text-xs font-medium text-slate-600">
+            TODO CheckList
+          </label>
+          <TodoListInput
+          todoList={taskData?.todoChecklist}
+          setTodoList={(value)=>handleValueChange("todoChecklist",value)}
+          
+          />
+
+         </div>
+           <div className="mt-3">
+            <label className="text-xs font-medium text-slate-600">Add Attachments</label>
+            <AddAttachments
+            attachments={taskData?.attachments}
+            setAttachments={(value)=>handleValueChange("attachments",value)}
+            />
+            
+           </div>
+           {error && (
+            <p className="text-xs font-medium text-red-500 mt-5">{error}</p>
+           )}
+           <div>
+            <button
+            className="add-btn"
+            onClick={handleSubmit}
+            disabled={loading}
+            >
+              {taskId?"UPDATE TASK":"CREATE TASK"}
+            </button>
+           </div>
         </div>
       </div>
      </div>
+     <Modal
+     isOpen={openDeleteAlert}
+     onClose={()=>setOpenDeleteAlert(false)}
+     title="Delete Task"
+     >
+      
+      <DeleteAlert content="Are you sure you want to delete this task?" onDelete={()=>deleteTask()}/>
+     </Modal>
     </DashboardLayout>
   )
 };

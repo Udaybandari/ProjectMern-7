@@ -3,6 +3,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPath";
 import { LuUsers } from "react-icons/lu";
 import Modal from "../Model";
+import AvatarGroup from "../layouts/AvatarGroup";
 
 const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
 
@@ -53,6 +54,11 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
           <LuUsers className="text-sm" />
           Add Members
         </button>
+      )}
+      {selectedUserAvatars.length>0&&(
+        <div>
+          <AvatarGroup avatars={selectedUserAvatars} maxVisible={3}/>
+          </div>
       )}
 
       <Modal
