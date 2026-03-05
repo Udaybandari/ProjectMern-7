@@ -13,21 +13,22 @@ import SelectUsers from "../../components/inputs/SelectUsers";
 import TodoListInput from "../../components/inputs/TodoListInput";
 import AddAttachments from "../../components/inputs/AddAttachments";
 import DeleteAlert from "../../components/layouts/DeleteAlert";
-const createTask = () => {
+const CreateTask = () => {
   
   const location=useLocation();
   const {taskId}=location.state||{};
-  
+  console.log("Your",taskId)
   const navigate=useNavigate();
- 
+ console.log(taskId)
   const [taskData,setTaskData]=useState({
     title:"",
     description:"",
     priority:"Low",
-    dueDate:null,
+    dueDate:"",
     assignedTo:[],
     attachments:[],
-  });
+  }); 
+  console.log("Yours",taskData)
   const[currentTask,setCurrentTask]=useState(null);
   const[error,setError]=useState("");
   const[loading,setLoading]=useState(false);
@@ -138,21 +139,22 @@ finally{
 const response = await axiosInstance.get( API_PATHS.TASKS.GET_TASK_BY_ID(taskId)
 );
 if (response.data) {
-const taskInfo = response.data;
-setCurrentTask(taskInfo);
-setTaskData ((prevState) => ({
-title: taskInfo.title,
-description: taskInfo.description,
-priority: taskInfo.priority,
-dueDate: taskInfo.dueDate
-? moment (taskInfo.dueDate).format("YYYY-MM-DD")
-: null,
-assignedTo: taskInfo?.assignedTo?.map((item) => item?._id) || [],
- todoChecklist:taskInfo?.todoChecklist?.map((item) => item?.text) || [],
-attachments: taskInfo?.attachments || [],
-}))
-}
-  }
+  const taskInfo = response.data;
+
+  setCurrentTask(taskInfo);
+
+  setTaskData({
+    title: taskInfo.title || "",
+    description: taskInfo.description || "",
+    priority: taskInfo.priority || "Low",
+    dueDate: taskInfo.dueDate
+      ? moment(taskInfo.dueDate).format("YYYY-MM-DD")
+      : "",
+    assignedTo: taskInfo?.assignedTo?.map(item => item?._id) || [],
+    todoChecklist: taskInfo?.todoChecklist?.map(item => item?.text) || [],
+    attachments: taskInfo?.attachments || [],
+  });
+}  }
   catch(error)
   {
    console.log("Error fetching users:",error)
@@ -180,6 +182,13 @@ error.response?.data?.message || error.message
   return ()=>{};
   },[taskId])
 }
+useEffect(()=>{
+  if(taskId)
+  {
+    getTaskDetailsById(taskId);
+  }
+  return ()=>{};
+},[taskId])
   return (
     <DashboardLayout activeMenu="Create Task">
      <div className="mt-5">
@@ -294,4 +303,4 @@ error.response?.data?.message || error.message
   )
 };
 
-export default createTask;
+export default CreateTask;

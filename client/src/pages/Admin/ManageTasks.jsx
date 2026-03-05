@@ -30,7 +30,7 @@ const ManageTasks = () => {
     ];
     setTabs(statusArray);
    }catch(error){
-
+           console.log(error);
    }
   }
   const handleClick =(taskData)=>{

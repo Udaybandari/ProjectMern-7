@@ -49,7 +49,7 @@ export const SIDE_MENU_USER_DATA=[
         id:"02",
         label: "My Tasks",
         icon:FaClipboardCheck,
-        path:"/user/tasks"
+        path:"/user/my-tasks"
     },
    
     {
