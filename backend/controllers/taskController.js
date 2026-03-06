@@ -55,6 +55,7 @@ const completedTasks=await Task.countDocuments({
     status:"Completed",
     ...(req.user.role !== "admin" && { assignedTo: req.user._id }),
 })
+
 res.json({
     tasks,
     statusSummary:{
@@ -256,6 +257,7 @@ const taskPriorityLevelsRaw = await Task.aggregate([
 },
 },
 ]);
+console.log("levels",taskPriorityLevelsRaw)
 taskDistribution["All"]=totalTasks;
 const taskPriorityLevels= taskPriorities.reduce( (acc, priority) =>  // Remove
 {
@@ -275,9 +277,10 @@ const taskPriorityLevels= taskPriorities.reduce( (acc, priority) =>  // Remove
         charts:{
             taskDistribution,
             taskPriorityLevels,
-
+            
         },
         recentTasks,
+        
     });
 }
     catch(error)

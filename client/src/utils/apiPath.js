@@ -13,7 +13,10 @@ export const API_PATHS = {
     UPDATE_USER: (userId) => `/api/users/${userId}`,
     DELETE_USER: (userId) => `/api/users/${userId}`,
   },
-
+   ADMINS:{
+  GET_ALL_ADMINS:"/api/admins",
+  DELETE_ADMIN: (adminId) => `/api/users/${adminId}`,
+   },
   TASKS: {
     // Dashboard
     GET_DASHBOARD_DATA: "/api/tasks/dashboard-data",

@@ -12,7 +12,7 @@ import InfoCard from "../../components/Cards/InfoCard";
 import TaskListTable from "../../components/layouts/TaskListTable";
 import CustomPieChart from "../../components/Charts/CustomPieChart";
 import CustomBarChart from "../../components/Charts/CustomBarChart";
-const COLORS=["#8D51FF","#00B8DB","#7BCE00"]
+import toast from "react-hot-toast"
 const Dashboard = () => {
   useUserAuth();
   const{user}=useContext(userContext);
@@ -35,6 +35,27 @@ const getDashboardData=async()=>{
     console.error("Error fetching users:",error);
   }
 }
+const deleteAdmin = async (id) => {
+  try {
+    const response = await axiosInstance.delete(
+      API_PATHS.ADMINS.DELETE_ADMIN(id)
+    );
+
+    if (response.data.logout) {
+      localStorage.removeItem("token");
+      navigate("/login");
+      return;
+    }
+
+    toast.success("Admin deleted successfully");
+
+    getAllAdmins();
+    getAllUsers();
+
+  } catch (error) {
+    console.error("error deleting admin", error);
+  }
+};
 const prepareChartData=(data)=>{
   const taskDistribution=data?.charts?.taskDistribution||null;
   const taskPriorityLevels=data?.charts?.taskPriorityLevels||null;
@@ -52,7 +73,7 @@ const prepareChartData=(data)=>{
   ]
   setBarChartData(PriorityLevelData);
 }
-console.log(dashboardData)
+console.log("dashbord",dashboardData)
 useEffect(()=>{
   getDashboardData();
  
@@ -61,11 +82,12 @@ useEffect(()=>{
   return (
     <DashboardLayout activeMenu="Dashboard">
     <div className="card my-5">
-      <div>
+      <div className="flex gap-188">
         <div className="col-span-3">
           <h2 className="text-xl md:text-2xl">Good Morning!{user?.name}</h2>
           <p className="text-xs md:text-[13px] text-gray-400 mt-1.5">{moment().format("dddd Do MMM YYYY")}</p>
         </div>
+        <button className="text-sm cursor-pointer rounded-md px-2 font-bold  bg-amber-500 py-1 " onClick={()=>deleteAdmin(user._id)}>Delete Account</button>
       </div>
        <div className="grid grid-cols-2  sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mt-5">
         <InfoCard

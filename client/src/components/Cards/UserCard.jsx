@@ -1,6 +1,7 @@
 import React from "react";
-
-const UserCard = ({userInfo}) => {
+import { LuTrash2 } from "react-icons/lu";
+const UserCard = ({userInfo,click}) => {
+  console.log(userInfo._id)
   return (
     <div className="user-card p-2">
         <div className="flex items-center justify-between">
@@ -10,9 +11,13 @@ const UserCard = ({userInfo}) => {
                 <p className="text-sm font-medium">{userInfo?.name}</p>
                 <p className="text-sm text-gray-500">{userInfo?.email}</p>
             </div>
+            
             </div>
+            <button className="cursor-pointer" onClick={()=>click(userInfo._id)} ><LuTrash2/></button>
               </div>
-            <div className="flex  items-end gap-3 mt-5">
+            {
+              userInfo?.role==="member"&&(
+                <div className="flex  items-end gap-3 mt-5">
            <StatCard
            label="Pending"
            count={userInfo?.pendingTasks||0}
@@ -30,6 +35,8 @@ const UserCard = ({userInfo}) => {
            />
             </div>
       
+              )
+            }
     </div>
   )
 };

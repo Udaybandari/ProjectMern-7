@@ -17,9 +17,9 @@ const CreateTask = () => {
   
   const location=useLocation();
   const {taskId}=location.state||{};
-  console.log("Your",taskId)
+
   const navigate=useNavigate();
- console.log(taskId)
+
   const [taskData,setTaskData]=useState({
     title:"",
     description:"",
@@ -28,7 +28,7 @@ const CreateTask = () => {
     assignedTo:[],
     attachments:[],
   }); 
-  console.log("Yours",taskData)
+
   const[currentTask,setCurrentTask]=useState(null);
   const[error,setError]=useState("");
   const[loading,setLoading]=useState(false);
@@ -164,14 +164,14 @@ if (response.data) {
   const deleteTask =async ()=>{
      
 try {
-await axiosInstance.delete(API_PATHS. TASKS.DELETE_TASK (taskId));
+await axiosInstance.delete(API_PATHS.TASKS.DELETE_TASK (taskId));
 setOpenDeleteAlert(false);
 toast.success("Expense details deleted successfully");
 navigate('/admin/tasks')
 } catch (error) {
-console.error(
+console.error("Error deleting expense:",
 );
-"Error deleting expense:",
+
 error.response?.data?.message || error.message
   };
   useEffect(()=>{

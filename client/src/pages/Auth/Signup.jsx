@@ -36,6 +36,7 @@ const Signup = () => {
      try{
       if(profilePic){
         const imgUploadRes=await uploadImage(profilePic);
+        console.log(imgUploadRes)
         profileImageUrl=imgUploadRes.imageUrl||"";
       }
      if (!profileImageUrl) {

@@ -2,18 +2,31 @@ import React, { useEffect, useState } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPath";
+import { useNavigate } from "react-router-dom";
 import UserCard from "../../components/Cards/UserCard";
 import toast from "react-hot-toast";
 const ManageUsers = () => {
-  
+  const navigate=useNavigate();
 const [allUsers, setAllUsers] = useState([]);
+const[allAdmins,setAllAdmins]=useState([]);
+console.log("admins",allAdmins)
 const getAllUsers = async () => {
 try {
 const response = await axiosInstance.get(API_PATHS.USERS.GET_ALL_USERS); 
 if (response.data?.length > 0) {
-  setAllUsers (response.data);
+  setAllUsers(response.data);
 }
-
+} catch (error) {
+console.error("Error fetching users:", error);
+}
+};
+const getAllAdmins = async () => {
+try {
+const response = await axiosInstance.get(API_PATHS.ADMINS.GET_ALL_ADMINS); 
+    console.log("ADMIN API RESPONSE:", response.data);
+if (response.data?.length > 0) {
+  setAllAdmins(response.data);
+}
 } catch (error) {
 console.error("Error fetching users:", error);
 }
@@ -38,10 +51,49 @@ catch(error){
   toast.error("Failed to download expense details.Please try again.");
 }
 }
-useEffect(()=>{
+const deleteUser = async (id) => {
+  try {
+    await axiosInstance.delete(API_PATHS.USERS.DELETE_USER(id));
+    toast.success("user deleted successfully");
+    // navigate('/admin/dashboard')
+    getAllUsers();
+
+  } catch (error) {
+    console.error("Error deleting user:",error);
+  }
+}
+const deleteAdmin = async (id) => {
+  try {
+    const response = await axiosInstance.delete(
+      API_PATHS.ADMINS.DELETE_ADMIN(id)
+    );
+
+    if (response.data.logout) {
+      localStorage.removeItem("token");
+      navigate("/login");
+      return;
+    }
+
+    toast.success("Admin deleted successfully");
+
+    getAllAdmins();
+    getAllUsers();
+
+  } catch (error) {
+    console.error("error deleting admin", error);
+  }
+};
+useEffect(() => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    navigate("/login");
+    return;
+  }
+
   getAllUsers();
-  return ()=>{};
-},[]);
+  getAllAdmins();
+}, []);
 return (
   
   <DashboardLayout activeMenu="Team Members">
@@ -65,14 +117,24 @@ return (
       Download Report
     </button>
   </div>
-
-  {/* Users Grid */}
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+   <div className="">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-6">
     {allUsers?.map((user) => (
-      <UserCard key={user._id} userInfo={user} />
+      <UserCard key={user._id} userInfo={user} click={deleteUser} />
     ))}
   </div>
+      <div className="mt-20" >
+         <h1 className="font-bold text-[27px] ">ADMINS</h1>
+       <div className="w-88 flex flex-col gap-2">
+        
+    {allAdmins?.map((admin) => (
+      <UserCard key={admin._id} userInfo={admin} click={deleteAdmin} />
+    ))}
+       </div>
+  </div>
+   </div>
 
+ 
 </div>
     </DashboardLayout>
 );

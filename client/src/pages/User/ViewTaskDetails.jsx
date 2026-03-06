@@ -41,7 +41,7 @@ const updateTodoChecklist = async (index) => {
 
   // Clone the checklist
   const todoChecklist = [...task.todoChecklist];
-  
+
   // Optimistically toggle completed
   todoChecklist[index] = {
     ...todoChecklist[index],
@@ -129,7 +129,7 @@ const updateTodoChecklist = async (index) => {
   task?.todoChecklist?.map((item, index) => (
     <TodoCheckList
       key={`todo_${index}`}
-      text={item.text}               // ✅ use 'text' instead of 'item'
+      text={item.text}               
       isChecked={item?.completed}
       onChange={() => updateTodoChecklist(index)}
     />

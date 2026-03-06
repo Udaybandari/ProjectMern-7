@@ -5,7 +5,7 @@ const ProfilePhotoSelector= ({ image, setImage }) => {
     const inputRef = useRef(null);
 const [previewUrl, setPreviewUrl] = useState(null);
 const handleImageChange = (event) => {
-    console.log(event);
+  
 const file = event.target.files[0];
 if (file) {
 
@@ -22,6 +22,7 @@ setPreviewUrl(null);
 
 const onChooseFile = () => {
     inputRef.current.click();
+
 };
 
 return <div className="flex justify-center mb-6 ">
@@ -29,7 +30,9 @@ return <div className="flex justify-center mb-6 ">
      ref={inputRef} 
      onChange={handleImageChange} 
      className="hidden"/>
+    
     {
+        
         !image?(
             <div className="w-20 h-20 flex items-center  justify-center bg-blue-100/50  rounded-full  relative cursor-pointer ">
                 <LuUser/>

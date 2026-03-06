@@ -26,13 +26,13 @@ const Login = () => {
       return;
     }
     setError("");
-    //Login API CALL
     try{
       const response=await axiosInstance.post(API_PATHS.AUTH.LOGIN,{
         email,
         password,
       })
       console.log(response.data);
+     
       const {token,role}=response.data;
       updateUser(response.data);
       if(token)
@@ -52,6 +52,7 @@ const Login = () => {
         setError(error.response.data.message);
       }
       else{
+         
           console.log("Full Error:", error);
   console.log("Response:", error.response);
   console.log("Data:", error.response?.data);

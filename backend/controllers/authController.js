@@ -5,6 +5,8 @@ const jwt=require("jsonwebtoken");
 const generateToken=(userId)=>{
     return jwt.sign({id:userId},process.env.JWT_SECRET,{expiresIn:"7d"});
 };
+
+
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, profileImageUrl, adminInviteToken } = req.body;
@@ -53,6 +55,7 @@ const registerUser = async (req, res) => {
 };
 const loginUser=async(req,res)=>{
     try{
+    
         const{email,password}=req.body;
         const user=await User.findOne({email});
         if(!user)

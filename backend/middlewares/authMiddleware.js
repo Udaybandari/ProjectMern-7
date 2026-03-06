@@ -3,9 +3,6 @@ const User = require("../models/User");
 
 // Middleware to protect routes
 const protect = async (req, res, next) => {
-  console.log("Authorization header:", req.headers.authorization);
-
-
   try {
     let token;
 
@@ -18,8 +15,8 @@ const protect = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       console.log("Decoded token:", decoded);
       req.user = await User.findById(decoded.id).select("-password");
-console.log("User found:", req.user);
-      next(); // move to next middleware
+
+      next(); 
     } else {
       return res.status(401).json({
         message: "Not authorized, no token",

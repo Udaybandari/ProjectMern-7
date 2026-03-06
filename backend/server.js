@@ -10,6 +10,7 @@ const authRoutes=require("./routes/authRoutes")
 const userRoutes=require("./routes/userRoutes")
 const taskRoutes=require("./routes/taskRoutes")
 const reportRoutes=require("./routes/reportRoutes")
+const adminRoutes=require("./routes/adminRoutes")
 // Connect to Database
 connectDB();
 
@@ -29,6 +30,7 @@ app.use("/api/auth",authRoutes);
 app.use("/api/users",userRoutes)
 app.use("/api/tasks",taskRoutes)
 app.use("/api/reports",reportRoutes);
+app.use("/api/admins",adminRoutes);
 app.use("/uploads",express.static(path.join(__dirname,"uploads")));
 // Test Route
 app.get("/", (req, res) => {

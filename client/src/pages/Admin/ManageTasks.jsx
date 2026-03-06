@@ -12,7 +12,7 @@ const ManageTasks = () => {
   const[tabs,setTabs]=useState([]);
   const[filterStatus,setFilterStatus]=useState("All");
   const navigate=useNavigate();
-  console.log(allTasks)
+  console.log("tabs",tabs);
   const getAllTasks =async ()=>{
    try{
     const response=await axiosInstance.get(API_PATHS.TASKS.GET_ALL_TASKS,{
@@ -22,11 +22,12 @@ const ManageTasks = () => {
     });
     setAllTasks(response.data?.tasks?.length>0?response.data.tasks:[])
     const statusSummary=response.data?.statusSummary||{};
+    // console.log("summary",statusSummary)
     const statusArray=[
       {label:"All",count:statusSummary.all||0},
       {label:"Pending",count:statusSummary.pendingTasks||0},
       {label:"In Progress",count:statusSummary.inProgressTasks||0},
-      {label:"Completed",count:statusSummary.completed||0}
+      {label:"Completed",count:statusSummary.completedTasks||0}
     ];
     setTabs(statusArray);
    }catch(error){
@@ -72,6 +73,7 @@ catch(error){
           Download Report
          </button>
         </div>
+        
         {tabs?.[0]?.count>0&&(
         <div>
           <TaskStatusTabs

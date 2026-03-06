@@ -34,6 +34,7 @@ res.json(usersWithTaskCounts)
         res.status(500).json({message:"server error",error:error.message});
     }
 }
+
 const getUserById=async (req,res)=>{
 try{
 const user=await User.findById(req.params.id).select("-password")
@@ -48,6 +49,19 @@ res.json(user);
         res.status(500).json({message:"server error",error:error.message});
     }
 }
+const deleteUser=async(req,res)=>{
+     try{
+         const user=await User.findById(req.params.id);
+         
+         if(!user) return res.status(401).json({message:"Task not found"});
+         await user.deleteOne();
+         res.json({message:"Task Deleted Successfully"})
+    }
+    catch(error)
+    {
+        res.status(401).json({message:"Server error",error:error.message})
+    }
+}
 
 
-module.exports={getUsers,getUserById};
+module.exports={getUsers,getUserById,deleteUser};
